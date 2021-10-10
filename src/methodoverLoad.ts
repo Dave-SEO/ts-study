@@ -16,3 +16,15 @@ const message: Message[] = [
         id: 3, type: 'audio', sendmessage: '今朝有酒今朝醉'
     }
 ]
+
+
+function getMessage(id: number): Message
+function getMessage(messageType: MessageType): Message[]
+function getMessage(value: any){
+    if(typeof value === "number"){
+        return message.find(ret => ret.id === value)
+    }else{
+        return message.filter(ret => ret.type === value)
+    }
+}
+getMessage('image')
