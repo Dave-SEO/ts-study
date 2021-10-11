@@ -8,7 +8,7 @@
     }
 ```
 
-3. 启动parcel 工具  npm start,
+3. 启动parcel 工具  npm start
 
 ## 类
 定义：类就是拥有相同属性和方法的一系列对象的集合
@@ -114,3 +114,98 @@ export function ref(value?:unknown){
     
     提供给重载签名的返回值类型不一定为其执行时的真实返回值类型，可以为重载签名提供真实返回类型，也可以提供void或unknown或any类型，如果重载签名的返回值类型是void或unknown或any类型，那么将由实现签名来决定重载签名执行时的真实返回值类型，当然为了调用时能有自动提示 + 可读性更好 + 避免可能出现了类型强制转换，强烈建议为重载签名提供真实的返回值类型
     不管重载签名返回值类型是何种类型，实现签名都可以返回any或unknown类型，当然一般我们选择让ts默认为实现签名自动推导返回值类型
+    
+### TS 方法重载
+方法：方法是一种特定场景下的函数，由对象变量直接调用的函数都是方法
+比如：
+- 接口内部定义的函数就是方法【注意：不是接口函数】
+- type 内部定义的函数是方法【注意：不是 type 函数】
+- 函数内部用this定义的函数是方法
+- 类中定义的函数是方法
+
+方法签名：方法名 + 方法参数 + 方法参数类型 + 返回值类型（与函数重载相同）
+
+
+```JavaScript
+    // 实现删除数组中的元素
+    // 1. 如果传入数字，则根据下标删除，返回当前被删除元素的下标，
+    // 2. 如果传入的是对象，则删除对应的对象，返回被删除的对象
+    class ArrayList {
+        constructor(public ele: Array<object>){}
+        remove(value: number): number
+        remove(value: object): object
+        remove(value: any){
+            if(typeof value === 'number'){
+                this.ele.splice(value, 1)
+            }else{
+                this.ele = this.ele.filter(ret => ret !== value)
+            }
+            return value
+        }
+    }
+    
+    let obj1 = {name: 'zhangsan', age: 21}
+    let obj2 = {name: 'lisi', age: 26}
+    let obj3 = {name: 'wangwu', age: 28}
+    const list = new ArrayList([obj1, obj2, obj3])
+    list.remove(obj3)
+
+```
+
+### 构造器【构造函数】重载
+#### 再次强化理解this
+this 其实是一个对象变量，当new出来一个对象时，构造器会隐式返回 this 给new 对象等号左边的变量，this和等号左边的对象变量都指向当前正创建的对象
+以后，哪一个对象调用TS类的方法，那么这个方法中的this都指向当前正在使用的对象【this 和当前的对象变量中都保存着当前对象的首地址】
+
+#### TS 构造器有返回值吗
+尽管TS类构造器会隐式返回this，如果我们非要返回一个值，TS类构造器只允许返回this，但构造器不需要返回值也能通过编译，更没有返回值类型之说。从这个意义上，TS构造器可以说是没有返回值的构造函数
+
+#### 构造器【构造函数】重载的意义
+构造器重载和函数重载使用基本相同，主要区别是：TS类构造器重载签名和实现签名都不需要管理返回值，TS 构造器是在对象创建出来之后，但是还没有赋值给对象变量之前被执行，一般用来给对象属性赋值
+在TS类中只能定义一个构造器，但实际应用时，TS类在创建对象时经常需要用到有多个构造器的场景，比如计算正方形的面积，创建正方形对象，可以给构造器传递宽和高，也可以给构造器传递一个对象，这样需要构造器重载来解决。
+
+#### 构造器是方法吗
+对象调用的才是方法，但是TS构造器是在对象空间地址赋值给对象变量之前被调用的，而不是用来被对象变量调用的，所以构造器可以说成构造函数，但不能背看成是一个方法
+
+#### 构造器重载案例
+> 计算巨型的面积。可以传入一个对象或者巨型的宽和高
+
+```JavaScript
+interface AreaProps {
+    width: number
+    height: number
+}
+class Size{
+    public width: number
+    public height: number
+    // 构造器重载签名和实现签名不需要有返回值
+    constructor(width: number, height: number)
+    constructor(area: AreaProps)
+    constructor(value: any, height: number = 0){
+       if(typeof value === 'object'){
+           this.width = value.width
+           this.height = value.height
+       }else{
+            this.width = value
+            this.height = height
+       }
+    }
+    size(){
+        return this.width * this.height
+    }
+}
+ const a1 = new Size(2, 3)
+ const a2 = new Size({width: 3, height: 4})
+```
+
+## TypeScript OOP 
+### 单件设计（单例）模式
+一个类对外有且仅有一个实例
+
+### 何时需要使用单例模式
+外部访问某个类的对象实例时，确保只能访问该类的唯一对象时才能保证逻辑的正确性时，使用单里模式
+
+### 前端单例模式的使用场景
+1. Vuex， React-Redux 中的全局状态管理容器store对象在整个项目被设计成唯一的对象
+
+2. 前端项目进行客户端本地数据存储时，都会考虑使用localStorage，localStorage只要在相同的协议，相同的主机名，相同的端口下，就能读取/修改到同一份localStorage数据
