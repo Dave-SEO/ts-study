@@ -20,11 +20,11 @@ const message: Message[] = [
 
 function getMessage(id: number): Message
 function getMessage(messageType: MessageType): Message[]
-function getMessage(value: any){
+function getMessage(value: MessageType | number){
     if(typeof value === "number"){
         return message.find(ret => ret.id === value)
     }else{
         return message.filter(ret => ret.type === value)
     }
 }
-getMessage('image')
+getMessage('')
