@@ -134,31 +134,55 @@ function Son(name) {
 
 Son.prototype = new Parent('doctor');
 Son.prototype.constructor = Son;
-var son = new Son('zhang1');
-console.log(Parent.prototype.constructor === Parent); // console.log(son.__proto__ === Son.prototype)
+var son = new Son('zhang1'); // console.log(Parent.prototype.constructor === Parent)
+// console.log(son.__proto__ === Son.prototype)
 // 冒充对象继承
+// function People (name, age, id){
+//     this.name = name
+//     this.age = age
+//     this.id = id
+// }
+// People.prototype.say = function(){
+//     console.log('Hello World')
+// }
+// function Samele(name, age, id, favor){
+//     // 实例对象samele借用 People 函数的方法，使实例对象samele具有了name、age、id属性
+//     People.call(this, name, age, id)
+//     // People.apply(this, [name, age, id]) // call apply唯一区别就是apply第二个参数传递的是一个数组
+//     this.favor = favor
+// }
+// Samele.prototype = new People()
+// const samele = new Samele('Samele', '18', '12345', 'music')
+// console.log('samele:', samele)
+// console.log('samele-say:', samele.say()) // samele.say is not a function
+// 寄生组合式继承
 
-function People(name, age, id) {
+function People(name, age) {
   this.name = name;
   this.age = age;
-  this.id = id;
 }
 
 People.prototype.say = function () {
   console.log('Hello World');
 };
 
-function Samele(name, age, id, favor) {
-  // 实例对象samele借用 People 函数的方法，使实例对象samele具有了name、age、id属性
-  People.call(this, name, age, id); // People.apply(this, [name, age, id]) // call apply唯一区别就是apply第二个参数传递的是一个数组
-
+function Samele(name, age, favor) {
+  People.call(this, name, age);
   this.favor = favor;
+} // 第一步：创建一个寄生构造函数
+
+
+function Middle() {
+  this.count = 123;
 }
 
-Samele.prototype = new People();
-var samele = new Samele('Samele', '18', '12345', 'music');
-console.log('samele:', samele);
-console.log('samele-say:', samele.say()); // samele.say is not a function
+Middle.prototype = People.prototype; // 第二步：创建一个寄生新创建的构造函数对象
+
+var middle = new Middle(); // middle.__proto__ === People.prototype // true
+// 第三步： Samele 子类的原型对象空间指向第二部的新创建的构造函数对象
+
+Samele.prototype = middle;
+var samele = new Samele('张三', 12, 'music');
 },{}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -187,7 +211,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51794" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64770" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

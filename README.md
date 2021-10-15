@@ -348,9 +348,39 @@ console.log('samele-say:', samele.say()) // samele.say is not a function
 2. 具备原型链继承的优点：实例对象可以访问父类原型对象上的属性和方法，也可以通过子类的原型对象访问父类的原型对象上的属性和方法
 
 #### 缺点
-调用了两次父类的构造函数 
+调用了两次父类的构造函数  new Samele 调用构造函数带来的问题：
+1. 进入 Samele 构造函数为属性赋值，分配内存空间，浪费内存
+2. 赋值导致效率下降了一些，并且无意义，出现代码冗余
 
 ### 寄生组合式继承【最佳继承模式 也是 TS采用的继承方式】
+
+
+```JavaScript
+function People (name, age){
+    this.name = name
+    this.age =age
+}
+People.prototype.say = function(){
+    console.log('Hello World')
+}
+function Samele(name, age, favor){
+    People.call(this, name, age)
+    this.favor = favor
+}
+
+// 第一步：创建一个寄生构造函数
+function Middle(){
+    this.count = 123
+}
+Middle.prototype = People.prototype
+// 第二步：创建一个寄生新创建的构造函数对象
+let middle = new Middle()
+// middle.__proto__ === People.prototype // true
+// 第三步： Samele 子类的原型对象空间指向第二部的新创建的构造函数对象
+Samele.prototype = middle
+
+let samele = new Samele('张三', 12, 'music')
+```
     
   
 
