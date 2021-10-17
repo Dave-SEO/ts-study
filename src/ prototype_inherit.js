@@ -61,6 +61,22 @@ Middle.prototype = People.prototype
 let middle = new Middle()
 // middle.__proto__ === People.prototype // true
 // 第三步： Samele 子类的原型对象空间指向第二部的新创建的构造函数对象
-Samele.prototype = middle
+
+function _exdents(parent, son){
+    function Middle(){
+        this.constructor = son
+    }
+    Middle.prototype = parent.prototype
+    return  new Middle()
+}
+
+Samele.prototype = _exdents(parent, Samele)
+// Samele.prototype.constructor = Samele
+
+
 
 let samele = new Samele('张三', 12, 'music')
+console.log(samele)
+
+
+

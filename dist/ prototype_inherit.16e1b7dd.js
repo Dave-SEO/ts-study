@@ -181,8 +181,19 @@ Middle.prototype = People.prototype; // 第二步：创建一个寄生新创建�
 var middle = new Middle(); // middle.__proto__ === People.prototype // true
 // 第三步： Samele 子类的原型对象空间指向第二部的新创建的构造函数对象
 
-Samele.prototype = middle;
+function _exdents(parent, son) {
+  function Middle() {
+    this.constructor = son;
+  }
+
+  Middle.prototype = parent.prototype;
+  return new Middle();
+}
+
+Samele.prototype = _exdents(parent, Samele); // Samele.prototype.constructor = Samele
+
 var samele = new Samele('张三', 12, 'music');
+console.log(samele);
 },{}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -211,7 +222,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64770" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51787" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
