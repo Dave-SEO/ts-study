@@ -481,4 +481,88 @@ passengerCar.getRent()
 2. 在子类重写的方法中调用父类同名方法，super重写方法
 
 错误用法： 当子类和父类有同名属性时，不可以在子类中用super来获取父类同名属性
-  
+
+### 上述TS类继承代码（汽车租赁）编译为ES5讲解
+你可以学到什么：
+
+ （1）setPrototypeOf 使用 和 Object.create 的区别
+ （2）父类静态方法和属性在子类中的继承：setPrototypeOf；
+     深度掌握 + 手写 + 优化底层 extendsStatics 方法实现
+     extendsStatics方法的作用：完成父类静态方法和属性在子类中的继承
+（3）深度掌握 _extends 方法
+
+#### setPrototypeOf
+
+```JavaScript
+function People (name, age){
+    this.name = name
+    this.age = age
+}
+People.prototype.say = function(){
+    console.log('Hello Son')
+}
+function Samele(name, age, favor){
+    People.call(this, name, age)
+    this.favor = favor
+}
+Samele.prototype.hls = function(){
+    console.log('hls')
+}
+function _exdents(son, parent){
+//     let middle =  Object.create(parent.prototype, {
+//         'name': {
+//             value: '张三',
+//             writable: true
+//         }
+//    })
+// return middle
+// Object.setPrototypeOf 为现有对象提供原型，返回一个新对象
+// 接收两个参数：第一个是现有对象，第二个是原型对象
+   return Object.setPrototypeOf(son.prototype, parent.prototype)
+   // 上面等价于 son.prototype.__proto__ = parent.prototype
+}
+_exdents(Samele, People)
+
+// Samele.prototype = _exdents(People)
+// Samele.prototype.constructor = Samele
+const samele = new Samele('zhangsan', 12, 'play')
+console.log(samele)
+// Object.setPrototypeOf 和 Object.create 的区别是并没有改变samele指向的原型对象空间，所以可以访问hls()
+samele.hls()
+```
+
+#### 子类继承父类的静态属性和静态方法
+
+```JavaScript
+function HlS() {}
+HlS.page = 'h'
+People.__proto__ = HlS
+function People(a){
+    this.a = a
+}
+People.say = function(){
+    console.log('Hello World')
+}
+People.age = 30
+
+// 方法一
+for (var key in People){
+    if(Object.hasOwnProperty.call(People, key)){
+        //  其实就是把父构造函数的静态属性和方法赋值到子构造函数的静态空间中
+        Samele[key] = People[key]
+    }
+}
+// 方法二
+Object.keys(People).forEach(key => {
+    Samele[key] = People[key]
+})
+// 方式三
+Samele.__proto__ = People
+
+// 方式四 es6
+Object.setPrototypeOf(Samele, People)
+
+function Samele(){}
+Samele.say()
+console.log('Samele-static', Samele.age) // 30
+```

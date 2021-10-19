@@ -71,3 +71,4 @@ class PassengerCar extends Cart{
 }
 const passengerCar = new PassengerCar('客车', '晋C5556', 30, 10)
 passengerCar.getRent()
+console.log('PassengerCar', PassengerCar.__proto__ === Cart)
