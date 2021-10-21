@@ -117,9 +117,8 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"src/ts_inherit.ts":[function(require,module,exports) {
-"use strict"; // ts 继承
-
+})({"src/ts_inherit.js":[function(require,module,exports) {
+// ts 继承
 var __extends = this && this.__extends || function () {
   var _extendStatics = function extendStatics(d, b) {
     _extendStatics = Object.setPrototypeOf || {
@@ -160,6 +159,11 @@ var Cart = function () {
     console.log("\u7236\u7C7B\u65B9\u6CD5 - \u54C1\u724C\uFF1A" + this.brand + ",\u8F66\u724C\u53F7\uFF1A" + this.cartNo + ",\u79DF\u7528\u5929\u6570\uFF1A" + this.days);
   };
 
+  Cart.getStatic = function () {
+    Cart.com = 1234;
+  };
+
+  Cart.com = 2;
   return Cart;
 }();
 
@@ -203,49 +207,7 @@ var MinCart = function (_super) {
 
 var minCart = new MinCart('小轿车', '浙A66666', 6, 'SUV');
 console.log(minCart.getRent());
-/**
- * @description 客车
- */
-
-var PassengerCar = function (_super) {
-  __extends(PassengerCar, _super);
-
-  function PassengerCar(_brand, _cartNo, _days, _num) {
-    var _this = _super.call(this, _brand, _cartNo, _days) || this;
-
-    _this.num = _num;
-    return _this;
-  } // 客车的价格计算:座位数
-
-
-  PassengerCar.prototype.getPrice = function () {
-    switch (this.num) {
-      case 10:
-        return 100;
-
-      case 30:
-        return 200;
-
-      default:
-        return 0;
-    }
-  };
-
-  PassengerCar.prototype.getRent = function () {
-    var price = this.days * this.getPrice();
-
-    _super.prototype.getRent.call(this); // 等价于 Cart.prototype.getRent.call(this)
-
-
-    console.log("\u54C1\u724C\uFF1A" + this.brand + ", \u5EA7\u4F4D\u6570\uFF1A" + this.num + ", \u8F66\u724C\u53F7\uFF1A" + this.cartNo + "\uFF0C\u79DF\u7528\u5929\u6570\uFF1A" + this.days + ",\u4EF7\u683C\uFF1A" + price);
-  };
-
-  return PassengerCar;
-}(Cart);
-
-var passengerCar = new PassengerCar('客车', '晋C5556', 30, 10);
-passengerCar.getRent();
-console.log('PassengerCar', PassengerCar.__proto__ === Cart);
+console.log(MinCart.com);
 },{}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -274,7 +236,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55462" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61633" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
@@ -450,5 +412,5 @@ function hmrAcceptRun(bundle, id) {
     return true;
   }
 }
-},{}]},{},["node_modules/parcel-bundler/src/builtins/hmr-runtime.js","src/ts_inherit.ts"], null)
-//# sourceMappingURL=/ts_inherit.e5755cc5.js.map
+},{}]},{},["node_modules/parcel-bundler/src/builtins/hmr-runtime.js","src/ts_inherit.js"], null)
+//# sourceMappingURL=/ts_inherit.2d9d07f5.js.map

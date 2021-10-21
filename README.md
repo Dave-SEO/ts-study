@@ -566,3 +566,282 @@ function Samele(){}
 Samele.say()
 console.log('Samele-static', Samele.age) // 30
 ```
+
+### TS继承 - 编译后源码_extends实现继承（以上述对汽车租赁公司TS继承举例）
+
+```JavaScript
+/**
+ * @description 对父类的继承（静态属性和静态方法，原型对象上的属性和方法）
+ */
+var _exdents = (this && this.__extends) || (function(){
+   var extendStatics = function(Son, Parent){
+        function extendsStaticWithForIn(Son, Parent){
+            for(let key in Parent){
+                if(Object.hasOwnProperty.call(Parent, key)){
+                    Son[key] = Parent[key]
+                }
+            }
+        }
+        function extendStaticWithObject(Son, Parent){
+            Son.__proto__ = Parent
+        }
+        extendStatics = Object.setPrototypeOf || extendsStaticWithForIn || extendStaticWithObject
+        return extendStatics(Son, Parent)
+    }
+    return function(Son, Parent){
+        extendStatics(Son, Parent)
+        function Middle(){
+            this.constructor = Son
+        }
+        if(Parent){
+            Middle.prototype = Parent.prototype
+            Son.prototype = new Middle()
+        }else{
+            Son.prototype = Object.create(Parent)
+        }
+    }
+    
+})()
+
+var Cart = (function(){
+    function Cart(_brand, _cartNo, _days) {
+        this.brand = _brand;
+        this.cartNo = _cartNo;
+        this.days = _days;
+    }
+    Cart.prototype.getRent = function () {
+        console.log("\u7236\u7C7B\u65B9\u6CD5 - \u54C1\u724C\uFF1A" + this.brand + ",\u8F66\u724C\u53F7\uFF1A" + this.cartNo + ",\u79DF\u7528\u5929\u6570\uFF1A" + this.days);
+    };
+    Cart.com = '1234'
+    return Cart;
+})()
+
+var MinCart = (function(_super){
+    // 子类MinCart 对父类的继承（静态属性和静态方法，原型对象上的属性和方法）
+    _exdents(MinCart, _super)
+    function MinCart(brand, cartNo, days, _type) {
+        var _this = 
+        // 调用父类的构造函数 为子类赋值
+        _super.call(this, brand, cartNo, days) || this;
+        _this.type = _type;
+        return _this;
+    }
+      // 每种车的计算方式不通，小轿车按照类型
+      MinCart.prototype.getPrice = function () {
+        switch (this.type) {
+            case '大众':
+                return 400;
+            case 'SUV':
+                return 600;
+            default:
+                return 0;
+        }
+    };
+    MinCart.prototype.getRent = function () {
+        var price = this.days * this.getPrice();
+        _super.prototype.getRent.call(this);
+        console.log("\u54C1\u724C\uFF1A" + this.brand + ", \u79CD\u7C7B\uFF1A" + this.type + ", \u8F66\u724C\u53F7\uFF1A" + this.cartNo + "\uFF0C\u79DF\u7528\u5929\u6570\uFF1A" + this.days + ",\u4EF7\u683C\uFF1A" + price);
+    };
+    MinCart.age = 1
+    return MinCart;
+})(Cart)
+var minCart = new MinCart('小轿车', '浙A66666', 6, 'SUV');
+console.log(minCart.getRent());
+console.log(MinCart.com)
+```
+
+## TS类型断言、转换
+TS 类型断言：把两种能有重叠关系的数据类型进行相互转换的一种TS语法，把其中一种数据类型转换成另外一种数据类型。类型断言和类型转换的效果是一样的，但语法不同
+
+TS类型断言的语法格式：A 数据类型的变量 as B 数据类型的变量。A 数据类型和 B 数据类型必须具有重叠关系。
+
+重叠关系：
+- 如果 A，B 是类并且有继承关系：
+    【extends 关系】无论A，B谁是父类或子类，A的对象变量可以断言成B类型，B的对象变量可以断言成A类型。但注意一般在绝大多数场景下都是把父类的对象变量断言成子类。
+
+```JavaScript
+class People {
+    name: string
+    age: number
+    constructor(name_: string, age_: number){
+        this.name = name_
+        this.age = age_
+    }
+    public say(){
+        console.log('Hello world')
+    }
+    get(){}
+}
+
+class Samale extends People {
+    favor: string
+    constructor(name_: string, age_: number, favor_: string){
+        super(name_, age_) // People.call(this, name_, age_)
+        this.favor = favor_
+    }
+    say(){
+        super.say() // _super.prototype.say.call(this)
+    }
+    savlit(){}
+}
+
+// 类型断言
+const people = new People('xiaoming', 12) as Samale
+const samale = new Samale('xiaoming', 12, 'music') as People
+
+// 类型转换
+const result = <People>new Samale('xiaoming', 12, 'music')
+```
+    
+- 如果 A，B 类没有继承关系：
+  两个类中的任意一个类的所有的public 实例属性【不包括静态属性】加上所有的public 实例方法和另一个类的所有 public 实例方法完全相同或是另外一个类的子集，则这两个类可以相互断言，否则这两个类就不能相互断言
+  
+```JavaScript
+// 一个类是另一个类的子集可以相互断言
+class People {
+    name: string
+    age: number
+    constructor(name_: string, age_: number){
+        this.name = name_
+        this.age = age_
+    }
+    say(){
+        console.log('Hello world')
+    }
+    get(){}
+}
+
+class Samale  {
+    favor: string
+    name !: string
+    age !: number
+    constructor(name_: string, age_: number, favor_: string){
+        this.favor = favor_
+    }
+    say(){
+    }
+    savlit(){}
+    get(){}
+}
+
+// 类型断言
+const people = new People('xiaoming', 12) as Samale
+const samale = new Samale('xiaoming', 12, 'music') as People
+
+// 类型转换
+const result = <People>new Samale('xiaoming', 12, 'music')
+
+```
+  
+- 如果 A 是类，B是接口，并且 A 类实现了 B 接口【implements】, 则 A 的对象变量可以断言成 B 接口类型，同样 B 接口类型的对象变量也可以断言成 A 类型。
+
+```JavaScript
+interface TextProps{
+    length: number
+}
+class Samale implements TextProps {
+    favor: string
+    name !: string
+    age !: number
+    length!: number
+    constructor(name_: string, age_: number, favor_: string){
+        this.favor = favor_
+    }
+    say(){
+    }
+}
+
+Samale as TextProps
+
+let text: TextProps = {length: 1}
+const result = text as Samale
+```
+- 如果 A 是类，B 是接口，并且A类没有实现 B 接口， 断言关系和第二项规则相同
+
+- 如果 A 是类， B 是type 定义的对象数据类型【就是引用数据类型，例如 Array对象，不能是基本数据类型，例如：string，number， boolean】，并且有 A 类 实现了 B type定义的数据类型【implements】，则 A 的对象变量可以断言成 B type 定义的对象数据类型，同样 B type 定义的对象数据类型的对象变量也可以断言成 A 类型。
+
+```JavaScript
+type TextAge = {name: string}
+class Samale implements TextAge {
+    favor: string
+    name !: string
+    age !: number
+    length!: number
+    constructor(name_: string, age_: number, favor_: string){
+        this.favor = favor_
+        this.age = age_
+    }
+    say(){
+    }
+  
+}
+
+Samale as TextAge
+
+let text: TextAge = { name: 'da'}
+const result = text as Samale
+```
+
+- 如果 A 是类， B 是type定义的数据类型，并且 A 类没有实现 B type 定义的数据类，则断言关系和第2项相同
+
+- 如果 A 是一个函数上参数变量的联合类型，例如 string ｜ number， 那么在函数内部可以断言成 string 或 number 类型。
+
+```JavaScript
+function Car (params: string | number){
+    params as string
+    params as number
+}
+```
+
+- 多个类组成的联合类型如何断言？例如： let people：car ｜ Bus ｜ Trunck。people 可以断言成其中任意一种数据类型。例如： people as car ， people as Bus， People as Trunck
+
+```JavaScript
+class Card {
+    name!: string
+    a(){}
+}
+class Truck {
+    age !: number
+    b(){}
+}
+class Merge {
+    say(params: Card | Truck){
+        (params as Card).a;
+        (params as Truck).b
+    }
+}
+```
+
+- 任何数据类型都可以转换成 any 或 unknown 类型， any 或 unknown 类型也可以转换成任何其他数据类型
+
+```JavaScript
+    let aa: number = 1
+    aa as any
+    aa as unknown
+    
+    let bb: any = 1
+    bb as number
+    bb as unknown
+```
+
+## TS 类型守卫
+### new 底层发生了什么？
+
+```JavaScript
+function Person(names, age){
+    this.name = names
+    this.age = age
+    this.say = function(){}
+    // 如果Person 返回的是值类型，那么会返回obj，如果是引用类型，返回引用类型，默认返回undefined
+    return undefined
+}
+let p = new Person('zhangsan', 13) 
+console.log(p) // Person{name: 'zhangsan', age: 13, say: ƒ}
+
+// new 的过程 发生了3步
+1. var obj = {}
+2. obj.__proto__ = Person.prototype
+3. Person.call(obj, 'zhangsan', 13) 
+
+console.log(obj) // Person{name: 'zhangsan', age: 13, say: ƒ}
+```

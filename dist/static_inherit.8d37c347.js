@@ -118,7 +118,41 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 
   return newRequire;
 })({"src/static_inherit.js":[function(require,module,exports) {
-// 子类继承父类的静态属性和静态方法
+var __extends = function () {
+  var extendStatics = function extendStatics(Son, Parent) {
+    //  function extendsStaticWithForIn(Son, Parent){
+    //      for(let key in Parent){
+    //          if(Object.hasOwnProperty.call(Parent, key)){
+    //              Son[key] = Parent[key]
+    //          }
+    //      }
+    //  }
+    //  function extendStaticWithObject(Son, Parent){
+    //      Son.__proto__ = Parent
+    //  }
+    //  extendStatics = Object.setPrototypeOf || extendsStaticWithForIn || extendStaticWithObject
+    //  return extendStatics(Son, Parent)
+    console.log(Son);
+    Object.setPrototypeOf(Son, Parent);
+  };
+
+  return function (Son, Parent) {
+    extendStatics(Son, Parent);
+
+    function Middle() {
+      this.constructor = Son;
+    }
+
+    if (Parent) {
+      Middle.prototype = Parent.prototype;
+      Son.prototype = new Middle();
+    } else {
+      Son.prototype = Object.create(Parent);
+    }
+  };
+}(); // 子类继承父类的静态属性和静态方法
+
+
 function HlS() {}
 
 HlS.page = 'h';
@@ -132,18 +166,27 @@ People.say = function () {
   console.log('Hello World');
 };
 
-People.age = 30;
+People.age = 30; // // 方法一
+// for (var key in People){
+//     if(Object.hasOwnProperty.call(People, key)){
+//         Samele[key] = People[key]
+//     }
+// }
+// // 方法二
+// Object.keys(People).forEach(key => {
+//     Samele[key] = People[key]
+// })
+// // 方法三
+// Samele.__proto__ = People
+// // 方法四
+// Object.setPrototypeOf(Samele, People)
 
-for (var key in People) {
-  if (Object.hasOwnProperty.call(People, key)) {
-    Samele[key] = People[key];
-  }
+__extends(Samele, People);
 
-  console.log(key);
-}
+function Samele() {}
 
-function Samele() {} // Samele.say()
-// console.log('Samele-static', Samele.age)
+Samele.say();
+console.log('Samele-static', Samele.age);
 },{}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -172,7 +215,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64770" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61633" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

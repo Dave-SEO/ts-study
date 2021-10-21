@@ -4,6 +4,7 @@ class Cart {
     brand: string
     cartNo: string
     days: number
+    static com: number = 2
     constructor (_brand: string, _cartNo: string, _days: number){
         this.brand = _brand
         this.cartNo = _cartNo
@@ -12,6 +13,9 @@ class Cart {
     // ts constructor以外定义的方法，不是放在自身对象上，而是放在了对象的原型对象空间中
     getRent(){
         console.log(`父类方法 - 品牌：${this.brand},车牌号：${this.cartNo},租用天数：${this.days}`)
+    }
+    static getStatic(){
+       Cart.com = 1234
     }
 }
 

@@ -117,34 +117,43 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"src/ts_inherit.ts":[function(require,module,exports) {
-"use strict"; // ts 继承
+})({"src/ts_static_inherit.js":[function(require,module,exports) {
+// ts 继承静态属性和方法 编译es5后的内容
 
-var __extends = this && this.__extends || function () {
-  var _extendStatics = function extendStatics(d, b) {
-    _extendStatics = Object.setPrototypeOf || {
-      __proto__: []
-    } instanceof Array && function (d, b) {
-      d.__proto__ = b;
-    } || function (d, b) {
-      for (var p in b) {
-        if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p];
+/**
+ * @description 对父类的继承（静态属性和静态方法，原型对象上的属性和方法）
+ */
+var _exdents = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(Son, Parent) {
+    function extendsStaticWithForIn(Son, Parent) {
+      for (var key in Parent) {
+        if (Object.hasOwnProperty.call(Parent, key)) {
+          Son[key] = Parent[key];
+        }
       }
-    };
-
-    return _extendStatics(d, b);
-  };
-
-  return function (d, b) {
-    if (typeof b !== "function" && b !== null) throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-
-    _extendStatics(d, b);
-
-    function __() {
-      this.constructor = d;
     }
 
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    function extendStaticWithObject(Son, Parent) {
+      Son.__proto__ = Parent;
+    }
+
+    _extendStatics = Object.setPrototypeOf || extendsStaticWithForIn || extendStaticWithObject;
+    return _extendStatics(Son, Parent);
+  };
+
+  return function (Son, Parent) {
+    _extendStatics(Son, Parent);
+
+    function Middle() {
+      this.constructor = Son;
+    }
+
+    if (Parent) {
+      Middle.prototype = Parent.prototype;
+      Son.prototype = new Middle();
+    } else {
+      Son.prototype = Object.create(Parent);
+    }
   };
 }();
 
@@ -153,23 +162,23 @@ var Cart = function () {
     this.brand = _brand;
     this.cartNo = _cartNo;
     this.days = _days;
-  } // ts constructor以外定义的方法，不是放在自身对象上，而是放在了对象的原型对象空间中
-
+  }
 
   Cart.prototype.getRent = function () {
     console.log("\u7236\u7C7B\u65B9\u6CD5 - \u54C1\u724C\uFF1A" + this.brand + ",\u8F66\u724C\u53F7\uFF1A" + this.cartNo + ",\u79DF\u7528\u5929\u6570\uFF1A" + this.days);
   };
 
+  Cart.com = '1234';
   return Cart;
 }();
 
 var MinCart = function (_super) {
-  __extends(MinCart, _super);
+  // 子类MinCart 对父类的继承（静态属性和静态方法，原型对象上的属性和方法）
+  _exdents(MinCart, _super);
 
   function MinCart(brand, cartNo, days, _type) {
     var _this = // 调用父类的构造函数 为子类赋值
-    _super.call(this, brand, cartNo, days) // 等价于 Cart.call(this, brand, cartNo, days)
-    || this;
+    _super.call(this, brand, cartNo, days) || this;
 
     _this.type = _type;
     return _this;
@@ -192,60 +201,18 @@ var MinCart = function (_super) {
   MinCart.prototype.getRent = function () {
     var price = this.days * this.getPrice();
 
-    _super.prototype.getRent.call(this); // 等价于 Cart.prototype.getRent.call(this)
-
+    _super.prototype.getRent.call(this);
 
     console.log("\u54C1\u724C\uFF1A" + this.brand + ", \u79CD\u7C7B\uFF1A" + this.type + ", \u8F66\u724C\u53F7\uFF1A" + this.cartNo + "\uFF0C\u79DF\u7528\u5929\u6570\uFF1A" + this.days + ",\u4EF7\u683C\uFF1A" + price);
   };
 
+  MinCart.age = 1;
   return MinCart;
 }(Cart);
 
 var minCart = new MinCart('小轿车', '浙A66666', 6, 'SUV');
 console.log(minCart.getRent());
-/**
- * @description 客车
- */
-
-var PassengerCar = function (_super) {
-  __extends(PassengerCar, _super);
-
-  function PassengerCar(_brand, _cartNo, _days, _num) {
-    var _this = _super.call(this, _brand, _cartNo, _days) || this;
-
-    _this.num = _num;
-    return _this;
-  } // 客车的价格计算:座位数
-
-
-  PassengerCar.prototype.getPrice = function () {
-    switch (this.num) {
-      case 10:
-        return 100;
-
-      case 30:
-        return 200;
-
-      default:
-        return 0;
-    }
-  };
-
-  PassengerCar.prototype.getRent = function () {
-    var price = this.days * this.getPrice();
-
-    _super.prototype.getRent.call(this); // 等价于 Cart.prototype.getRent.call(this)
-
-
-    console.log("\u54C1\u724C\uFF1A" + this.brand + ", \u5EA7\u4F4D\u6570\uFF1A" + this.num + ", \u8F66\u724C\u53F7\uFF1A" + this.cartNo + "\uFF0C\u79DF\u7528\u5929\u6570\uFF1A" + this.days + ",\u4EF7\u683C\uFF1A" + price);
-  };
-
-  return PassengerCar;
-}(Cart);
-
-var passengerCar = new PassengerCar('客车', '晋C5556', 30, 10);
-passengerCar.getRent();
-console.log('PassengerCar', PassengerCar.__proto__ === Cart);
+console.log(MinCart.com);
 },{}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -274,7 +241,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55462" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61633" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
@@ -450,5 +417,5 @@ function hmrAcceptRun(bundle, id) {
     return true;
   }
 }
-},{}]},{},["node_modules/parcel-bundler/src/builtins/hmr-runtime.js","src/ts_inherit.ts"], null)
-//# sourceMappingURL=/ts_inherit.e5755cc5.js.map
+},{}]},{},["node_modules/parcel-bundler/src/builtins/hmr-runtime.js","src/ts_static_inherit.js"], null)
+//# sourceMappingURL=/ts_static_inherit.8744e6c2.js.map
