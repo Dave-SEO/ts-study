@@ -1042,9 +1042,37 @@ abstract class People {
 2. 防止实例化一个实例后毫无意义的类
 
 ### 抽象类和接口结合的真实应用场景
+```javascript
+interface MouseListenerProcess{
+   mouseEnter(e: MouseEvent): void
+   mouseLeave(e: MouseEvent): void
+   mouseDown(e: MouseEvent): void
+   mouseUp(e: MouseEvent): void
+}
 
-export {}
+//adapter 的好处是在实现具体功能时可以提示具体要实现的方法，并且不需要实现目前用不到的
+abstract class MouseListenerAdapter implements MouseListenerProcess{
+    mouseEnter(e: MouseEvent): void {
+        throw new Error("Method not implemented.");
+    }
+    mouseLeave(e: MouseEvent): void {
+        throw new Error("Method not implemented.");
+    }
+   abstract mouseDown(e: MouseEvent): void
+   abstract mouseUp(e: MouseEvent): void
+}
+
+
+class  mouseProcess extends MouseListenerAdapter{
+    mouseDown(e: MouseEvent): void {
+        throw new Error("Method not implemented.");
+    }
+    mouseUp(e: MouseEvent): void {
+        throw new Error("Method not implemented.");
+    }
+}
 ```
+
 
 ## TypeScript 新特性
 ### const 为何也能被修改？如何解决
