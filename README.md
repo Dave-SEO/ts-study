@@ -907,6 +907,71 @@ const output = function(obj: any){
 output(obj)
 ```
 
+### 自定义守位
+格式：
+
+```JavaScript
+// A 可以是类、接口、基础数据类型等。
+function 函数名(形参：参数类型【参数类型大多为any】) : 形参 is A类型 {
+    return true or false
+}
+```
+理解： 返回布尔值的条件表达式赋予类型守卫的能力，只有当函数返回true时，形参确定为A类型
+
+场景：
+
+```JavaScript
+// 自定义守位
+function isString(str: any): str is string{
+    return typeof str === 'string'
+}
+function isFunction(fn: any): fn is Function{
+    return typeof fn === 'function'
+}
+
+interface Props {
+    username: string;
+    eat: () => void,
+    allowinput?: number
+}
+
+class Utils {
+    public static strim(str: string){
+       return str.replace(/\s+/g, '')
+    }
+}
+let obj: Props = {
+    username: 'He llo  World',
+    eat(){
+        console.log(Utils.strim(this.username))
+    },
+    allowinput: 1
+}
+
+const output = function(obj: any){
+    if(obj == null && JSON.stringify(obj) === '{}'){
+        console.log('对象不合法')
+        return
+    }
+    if('allowinput' in obj){
+        Object.keys(obj).forEach(key => {
+            if(typeof obj[key] === 'string'){
+                Utils.strim(obj[key])
+            }else if(typeof obj[key] === 'function'){
+            let value = obj[key]
+            if(isString(value)){
+                Utils.strim(value)
+            }else if(isFunction(value)){
+                obj[key]()
+            }else{
+                console.log('其他属性：', key)
+            }
+        })
+    }
+}
+output(obj)
+```
+
 ### typeof 的替代：
 Object.prototype.toString.call([]) //[object Array] 表示类型是object，是由Array创建的
 
@@ -977,3 +1042,34 @@ abstract class People {
 2. 防止实例化一个实例后毫无意义的类
 
 ### 抽象类和接口结合的真实应用场景
+
+export {}
+```
+
+## TypeScript 新特性
+### const 为何也能被修改？如何解决
+
+```JavaScript
+// 引用类型的常量，只要内存地址不变，是可以修改的，可以加 as const 解决
+const arr = [1,2,3,'san'] as const
+
+const getArr = function(arr: readonly any[]){
+    // arr.push()  类型“readonly any[]”上不存在属性“push”。
+}
+getArr(arr)
+```
+
+### 可变元组、元组标签
+
+```JavaScript
+// 可变元组 ... 剩余参数
+const mytuple: [string, number, ...any[]] = ['zhangsan', 12, 'music', 'chinese']
+
+// 元组标签
+const mytuple: [name: string, age: number, ...rest: any[]] = ['zhangsan', 12, 'music', 'chinese']
+
+// TS 允许剩余参数不是必须在末尾
+const [x1, ...rest]: [name: string, ...rest: any[], age: number] = ['zhangsan', 'music', 'chinese', 12]
+console.log('x1-', x1) // zhangsan
+console.log('rest-', rest) // [ 'music', 'chinese', 12 ]
+```
