@@ -11,7 +11,6 @@ class AmericaPeople extends Person{
 }
 
 let person:Person = new ChinesePeople()
-
 person.eat()
 person = new AmericaPeople()
 person.eat()
