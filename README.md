@@ -845,3 +845,135 @@ console.log(p) // Person{name: 'zhangsan', age: 13, say: ƒ}
 
 console.log(obj) // Person{name: 'zhangsan', age: 13, say: ƒ}
 ```
+
+### 类型守卫定义
+在语句的块级作用域【if语句内或条目运算符表达式内】缩小变量的一种类型推断的行为
+
+### 类型守卫产生的时机
+在TS条件语句中遇到下列关键字时，会在语句的块级作用域内缩小变量的类型，这种类型推断的行为称为类型守卫。类型守卫可以帮助我们在块级作用域中获得更为需要的精确变量类型，从而减少不必要的类型断言
+- 类型判断：typeof(用来检测一个变量或一个对象的数据类型)
+- 属性或者方法或者函数判断：in
+- 实例判断：instanceof
+- 字面量相等判断：==, ===, !=, !==
+
+### TS 类型守卫晋级考核题
+请编写一个操作对象方法和属性的函数实现以下功能
+
+1. 当对象字符串属性有空格时就去掉空格后输出。
+2. 当遇到对象函数时就执行，其他数据类型的属性一律直接输出
+3. 只有对象中包含allowinput 属性时，才允许输出
+4. 函数接收到外部传入的null，undefined，{}时，直接输出不是一个合法的对象
+
+> 考核点：1.考核对类型守卫的熟练运用程度 2. 静态方法
+
+```JavaScript
+interface Props {
+    username: string;
+    eat: () => void,
+    allowinput?: number
+}
+
+class Utils {
+    public static strim(str: string){
+       return str.replace(/\s+/g, '')
+    }
+}
+let obj: Props = {
+    username: 'He llo  World',
+    eat(){
+        console.log(Utils.strim(this.username))
+    },
+    allowinput: 1
+}
+
+
+const output = function(obj: any){
+    if(obj == null && JSON.stringify(obj) === '{}'){
+        console.log('对象不合法')
+        return
+    }
+    if('allowinput' in obj){
+        Object.keys(obj).forEach(key => {
+            if(typeof obj[key] === 'string'){
+                Utils.strim(obj[key])
+            }else if(typeof obj[key] === 'function'){
+                obj[key]()
+            }else{
+                console.log('其他属性：', key)
+            }
+        })
+    }
+}
+output(obj)
+```
+
+### typeof 的替代：
+Object.prototype.toString.call([]) //[object Array] 表示类型是object，是由Array创建的
+
+但是无法获取一个自定义的类的实例变量或构造函数的对象变量的真正创建类型`[object object]`，必须使用 instanceof 来解决
+
+### instanceof
+- 对象变量.proto = 类名或函数名.prototype
+  如果instanceof 关键字 左边对象变量的proto 属性指向的原型对象空间 = 右边类名或函数名的prototype 对象属性指向的原型对象空间，那么返回true
+- 对象变量._proto_._proto_....._proto_ = 类名或函数名.prototype
+    instanceof 左边对象变量proto 的1到多个上一级proto指向的原型对象空间，等于右边类名或函数名的prototype 对象属性指向的原型对象空间，那么也返回true，按照这个规律查找，直到Object.prototype 对象属性指向的原型对象空间为止。
+    
+## 多态
+### 定义
+ 父类的对象变量可以接受任何一个子类的对象，从而用这个父类的对象变量来调用子类中重写的方法而输出不同的结果
+
+### 产生多态的条件
+1. 必须存在继承关系
+2. 必须有方法重写
+
+### 多态的好处
+1. 利于项目的扩展【从局部满足了 开放封闭原则 -- 对修改关闭，对扩展开放】
+
+### 多态的局限性
+1. 无法直接调用子类独有方法，必须结合instanceof类型守卫来解决
+
+```JavaScript
+class Person{
+    eat(){}
+}
+
+class ChinesePeople extends Person{
+    eat(){console.log('吃中餐')}
+}
+
+class AmericaPeople extends Person{
+    eat(){console.log('吃西餐')}
+}
+
+let person:Person = new ChinesePeople()
+
+person.eat()
+person = new AmericaPeople()
+person.eat()
+export { }
+```
+
+### 多态的使用场景
+
+## TS抽象类【abstract class】
+> 一个在任何位置都不能被实例化的类就是一个抽象类，抽象类不能被实例化
+
+什么样的类可以被定义为抽象类？
+从宏观上来说，任何一个实例化后毫无意义的类都可以被定义为抽象类。比如：我们实例化一个玫瑰花类的对象变量，可以得到一个具体的 玫瑰花 实例对象，但如果我们实例化一个 Flower 类的对象变量，那世界上有一个叫 花 的对象吗？很明显没有，
+所以 Flower 类可以定义为一个抽象类，但玫瑰花可以定义为具体的类。
+
+## TS 抽象方法
+1. 没有方法体，只有方法声明
+2. 带abstract 关键字
+
+```JavaScript
+abstract class People {
+    public name:string
+    public abstract eat(): void;
+}
+```
+### 抽象类的优点
+1. 提供统一名称的抽象方法，提高代码的可维护性：抽象类通常用来充当父类，当抽象类把一个方法定义为抽象方法，那么会强制在所有子类中实现它，防止不同子类的同功能的方法名不相同，从而降低项目维护成本。
+2. 防止实例化一个实例后毫无意义的类
+
+### 抽象类和接口结合的真实应用场景
