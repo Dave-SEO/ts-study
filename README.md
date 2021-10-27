@@ -1101,3 +1101,51 @@ const [x1, ...rest]: [name: string, ...rest: any[], age: number] = ['zhangsan', 
 console.log('x1-', x1) // zhangsan
 console.log('rest-', rest) // [ 'music', 'chinese', 12 ]
 ```
+
+## 泛型
+- 定义时不明确，使用时必须明确成某种具体的数据类型
+- 编译期间进行数据类型安全检查的数据类型
+- 泛型是参数化的数据类型
+
+```JavaScript
+class 类名<泛型形参类型> 泛型形参类型必须是 A-Z 任何一个字母，如下：
+
+class ArrayList<T>{
+    array: Array<T>
+    name: T[]
+    add(data:T){}
+}
+// 可以给泛型加默认值
+class ArrayList<T = any>
+```
+
+### object 为什么不能替代类上的泛型？
+1. 编译期间 object 无法进行类型安全检查，而泛型在编译期间可以进行类型安全检查
+2. object 类型数据无法接受非object 类型的变量，只能接受object 类型的变量
+3. object 类型数据获取属性和方法时无自动提示 
+
+### any为什么不能替代类上的泛型
+1. 编译器间 any 无法进行类型安全检查，而泛型在编译期间可以
+2. any 扩大数据类型的属性后没有编译错误导致潜在错误风险，而泛型却有效避免了此类问题
+3. any 数据类型获取属性和方法时无自动提示，泛型有自动提示
+
+### any 类型带来的好处（结合自定义守卫）
+
+```JavaScript
+// 自定义守卫 形参接收任意类型用来判断是否是顾客
+function isCustomer(customer: any): customer is Customer{
+    return Boolean(customer && customer.customerName)
+}
+class Customer {
+    constructor(public customerName: string) {
+    }
+}
+const a1 = {favor: 'music', age: 12}
+const a2 = isCustomer(a1)? a1.customerName : undefined
+console.log('a2', a2)
+
+const customer1 = new Customer('zhangsan')
+const c = isCustomer(customer1)? customer1.customerName : undefined
+console.log('c', c)
+export{}
+```
