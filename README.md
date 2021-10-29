@@ -1149,3 +1149,47 @@ const c = isCustomer(customer1)? customer1.customerName : undefined
 console.log('c', c)
 export{}
 ```
+
+### 泛型约束
+T extends object 【是泛型约束的一种表现】泛型约束简单点说就是把泛型的具体化数据类型范围缩小，extends 表示具体化的泛型类型只能是object类型，某个变量如果能断言成object类型【变量 as object】，那么这个变量的类型就符合 T extends object，就是说该变量的类型可以是T的具体化类型
+
+任何一个类或者构造函数的底层都是从 new Object() 而来的，这个new Object() 对象的类型就是object类型，这就是说任何类的对象或者构造函数的对象都符合 T extends object
+
+### keyof
+表示获取一个类或者一个对象类型或者一个接口类型的所以属性名组成的联合类型
+
+```JavaScript
+const obj1 = {userName: 'zhangsan', age: 12}
+
+type ObjectKeyOf = keyof typeof obj1
+const a1: ObjectKeyOf = 'age' // 只能是 userName ｜ age 组成的联合类型
+
+
+interface KeyofProps {
+    behavir: string,
+    name: string
+}
+type ObjectKeyOf1 = keyof KeyofProps
+const a2: ObjectKeyOf1 = 'behavir' // behavir | name 组成的联合类型
+
+
+class People {
+    constructor(public name: string, public age: number) { }
+    say(){}
+}
+type ObjectKeyOf2 = keyof People
+const a3:ObjectKeyOf2 = 'age' // name | age | say 组成的联合类型
+
+// vue3 对keyof 的使用
+class ObjectRefImpl<T extends object, k extends keyof T> {
+    constructor(public _object: T,public _key: k) {}
+    get value(){
+        return this._object[this._key]
+    }
+    set value(newVal: T[k]){
+        this._object[this._key] = newVal
+    }
+}
+```
+
+### TS 泛型接口

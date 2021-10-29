@@ -50,3 +50,5 @@ class Size{
 }
  const a1 = new Size(2, 3)
  const a2 = new Size({width: 3, height: 4})
+
+ export {}
