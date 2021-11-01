@@ -20,8 +20,9 @@ class EnglishCouser extends Couser {
     }
  }
 
-let chinese = new ChineseCouser()
-let english = new EnglishCouser()
+// 父类的对象变量可以接受任意子类的对象
+let chinese: Couser = new ChineseCouser()
+let english: Couser = new EnglishCouser()
 
 Couser.getCouser(chinese)
 Couser.getCouser(english)

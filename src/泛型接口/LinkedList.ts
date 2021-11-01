@@ -15,4 +15,5 @@ class LinkedList<T> implements List<T> {
     }
 }
 
+// 接口类型对象变量可以接受任何它的实现类的对象
 const link: List<string> = new LinkedList<string>()
