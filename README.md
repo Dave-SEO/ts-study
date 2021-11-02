@@ -1270,3 +1270,113 @@ const quicksort = sort<number[]>([85, 24, 63, 45, 17, 31, 96, 50])
 const strArr = sort<string[]>(['武汉', '郑州', '太原', '济南', '沈阳', '大连'])
 const str = sort<string>('cdabe')
 ```
+
+### 工厂函数类型
+定义：代表任意一个类的构造函数【等价于js的构造函数】的函数类型
+
+```JavaScript
+// 此处的new不是创建类的意思，而是表示类的构造函数类型
+ new (...arg) => any
+```
+
+#### 泛型工厂函数类型
+定义：一个可以创建任意类对象的通用泛型函数
+
+```JavaScript
+type ConstructorProps<T> = new (...arg: any): T
+```
+
+#### 场景
+1. 在一些不方便或者没有办法直接new 类名() 格式来创建对象，例如：装饰器中
+2. 在一些项目测试或者调试中简化代码使用
+
+```JavaScript
+ type ConstructorProps<T> = new (...arg: any): T
+ function createInstanceFactory(Constructor: ConstructorProps<T>){
+    return new Constructor()
+ }
+ const a1 = createInstanceFactory<People>(People)
+```
+#### 类的双重性质
+
+```JavaScript
+// 1. People可以作为类构造函数对象变量，去调用类的静态方法和属性，变量才可以去调用属性，单纯的类型是无法调用其他属性的，例如object.xxx 无法调用，而Object可以
+// 2. 作为类型
+class People{}
+```
+
+## TS 交叉类型
+### 定义
+将多个类型合并【多个类型属性和方法的并集】成的类型就是交叉类型
+
+### 和联合类型的区别：
+赋值区别：
+交叉类型是多个类型属性和方法的合并后的类型，属于多个类型的并集，必须是两个类型的全部属性和方法才能赋值给交叉类型的变量。【可选属性和方法除外】
+
+而联合类型的变量可以接受联合类型中的任意一种数据类型全部属性和方法，也可以是两个类型的全部属性和全部方法 【可选属性和方法除外】
+
+获取属性和方法区别：
+交叉类型变量可以获取两个类型的任意属性和任意方法，而联合类型的变量只能获取两个类型的共同属性和方法【交集属性和交集方法】
+
+```JavaScript
+// 定义类型别名
+type ObjProps = {userName: string, age: number}
+type ObjProps1 = {curse: string, age: number, phone: number}
+// 交叉类型 - 必须是两种类型的集合
+const obj1: ObjProps & ObjProps1 = {
+    userName: '',
+    age: 1,
+    curse: '',
+    phone: 123
+}
+
+// 联合类型 可以是其中的一种属性，也可以是两种属性，也可以是其中一种类型的属性外加另一种的部分属性
+const obj2: ObjProps | ObjProps1 = {
+    userName: '',
+    age: 1,
+    curse: '',
+}
+```
+
+### 泛型函数重载 + 交叉类型的应用
+> 使用泛型函数重载实现对象的合并
+
+```JavaScript
+// 定义类型别名
+type ObjProps = {userName: string, age: number}
+type ObjProps1 = {curse: string, age: number, phone: number}
+type ObjProps3 = {id: number, favor: string}
+
+const o1: ObjProps = {userName: 'zhangsan', age: 12}
+const o2: ObjProps1 = {curse:'语文', age: 12, phone: 12345678 }
+const o3: ObjProps3 = {id: 1, favor: 'music'}
+
+// 泛型函数重载-对象的合并
+function cross<T extends object, U extends object>(objOne: T, objTwo: U): T & U
+function cross<T extends object, U extends object, V extends object>(objOne: T, objTwo: U, objThree: V): T & U & V
+function cross <T extends object, U extends object, V extends object> (objOne: T, objTwo: U, objThree?: V){
+    let combine = {} as  T & U
+    Object.keys(objOne).forEach((key) => {
+        combine[key] = objOne[key]
+    })
+
+    Object.keys(objTwo).forEach((key) => {
+        combine[key] = objTwo[key]
+    })
+    if(objThree){
+        // combine 为什么可以断言成 T & U & V ？
+        // 1. 编译期间：combine 还是一个空对象，空对象是任何类型的子集，所以可以断言为 T & U & V
+        // 2. 运行期间：combine 是一个 T & U 类型, T & U 是 T & U & V 的子集，所以可以断言为 T & U & V（一个类型是另一个类型的子集可以进行类型断言）
+        let combine2 = combine as typeof combine & V
+        Object.keys(objThree).forEach((key) => {
+            combine2[key] = objThree[key]
+        })
+        return combine2
+    }
+    return combine
+}
+
+const result1 = cross<ObjProps,ObjProps1>(o1, o2)
+
+const result2 = cross<ObjProps, ObjProps1, ObjProps3>(o1, o2, o3)
+```
