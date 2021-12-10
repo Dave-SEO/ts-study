@@ -1156,7 +1156,7 @@ T extends object 【是泛型约束的一种表现】泛型约束简单点说就
 任何一个类或者构造函数的底层都是从 new Object() 而来的，这个new Object() 对象的类型就是object类型，这就是说任何类的对象或者构造函数的对象都符合 T extends object
 
 ### keyof
-表示获取一个类或者一个对象类型或者一个接口类型的所以属性名组成的联合类型
+表示获取一个类或者一个对象类型或者一个接口类型的所有属性名组成的联合类型
 
 ```JavaScript
 const obj1 = {userName: 'zhangsan', age: 12}
@@ -1380,3 +1380,40 @@ const result1 = cross<ObjProps,ObjProps1>(o1, o2)
 
 const result2 = cross<ObjProps, ObjProps1, ObjProps3>(o1, o2, o3)
 ```
+
+## infer 
+> infer 表示在 extends 条件语句中以占位符出现的用来修饰数据类型的关键字，被修饰的数据类型等到使用时才能被推断出来
+ 
+### infer 占位符式的关键字出现的位置
+- infer 出现在 extends 条件语句后的函数类型的参数类型位置上
+
+```JavaScript
+ interface Customer {
+    name: string;
+    age: number;
+ }
+ type customFuncType = (cus: Customer) => string;
+ type inferType<T> = T extends (params: infer P) => any ? P : T
+ type inferResultType = inferType<customFuncType> // inferResultType 类型为 Customer
+```
+- infer 出现在extends条件语句后的函数类型的返回值类型上
+
+```JavaScript
+  interface Customer {
+    name: string;
+    age: number;
+ }
+  type customFuncType = (cus: Customer) => string;
+  type inferType<T> = T extends (params: any) => infer P ? P : T;
+  type inferReturnType = inferType<customFuncType> // inferReturnType 类型为string
+```
+- infer 出现在类型的泛型具体化类型上
+
+```JavaScript
+type Elementinfer<T> = T extends Set<infer P> ? P : never
+let result: Elementinfer<Set<string>>
+```
+
+### infer 和 泛型的区别
+1. 泛型类型需要先定义， infer 修饰的类型无需先定义
+2. infer 需要出现在extends 之后

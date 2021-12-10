@@ -37,4 +37,10 @@ const objectImpl = new ObjectRefImpl(order1, 'orderId')
 
 console.log(objectImpl)
 
+
+const a1 = {'name': 'zhangsan', 'age': 12}
+function get<T, K extends keyof T>(obj: T, key: K){
+   return obj[key]
+}
+get(a1, 'name')
 export {}
