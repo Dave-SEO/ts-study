@@ -1417,3 +1417,19 @@ let result: Elementinfer<Set<string>>
 ### infer 和 泛型的区别
 1. 泛型类型需要先定义， infer 修饰的类型无需先定义
 2. infer 需要出现在extends 之后
+
+### infer 的应用场景
+先回顾两点知识
+
+```JavaScript
+class Car {
+  public carAge: number
+  public carColor: string
+  constructor(carAge, carColor) {
+    this.carAge = carAge
+    this.carColor = carColor
+  }
+}
+1. 类有双重性质，可以当作一个变量，也可以当作一个类类型
+2. 上面的构造函数类型为 new (carAge, carColor) => any 等价于 typeof Car
+```

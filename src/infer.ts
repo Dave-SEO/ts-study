@@ -14,4 +14,7 @@ type custFuncType1 = (cus: Customer) => string
 type inferReturnType<T> = T extends (params: any) => infer P ? P : T
 type inferResultType1 = inferReturnType<custFuncType1>
 
+
+type Elementinfer<T> = T extends Set<infer P> ? P : never
+let result: Elementinfer<Set<string>>
 export {}
