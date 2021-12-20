@@ -2,6 +2,7 @@
 
 const mytuple: [name: string, age: number, ...rest: any[]] = ['zhangsan', 12, 'music', 'chinese']
 
+// name, age为元组标签
 const [x1, ...rest]: [name: string, ...rest: any[], age: number] = ['zhangsan', 'music', 'chinese', 12]
 console.log('x1-', x1) // zhangsan
 console.log('rest-', rest) // [ 'music', 'chinese', 12 ]

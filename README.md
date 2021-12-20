@@ -1433,3 +1433,29 @@ class Car {
 1. 类有双重性质，可以当作一个变量，也可以当作一个类类型
 2. 上面的构造函数类型为 new (carAge, carColor) => any 等价于 typeof Car
 ```
+
+如何获取构造函数参数类型？
+
+```JavaScript
+class Person {
+    constructor(public cname: string, public age: number){}
+    eat(){
+        console.log(`姓名：${this.cname},年龄：${this.age}`)
+    }
+}
+// 构造函数参数类型
+type ConstructorParamsType<T extends new (...args: any[]) => any> = T extends new (...args: infer p) => any ? p : never
+```
+
+ 构建带参数的通用工厂函数
+  
+```JavaScript
+// ...接上
+// 通用工厂函数类型
+type ConstructorType<T> = new (...args: any[]) => T
+// 构建带参数的通用工厂函数
+function createInstance<T, P extends ConstructorType<any>>(constructor: ConstructorType<T>, ...args: ConstructorParamsType<P>){
+    return new constructor(...args)
+}
+createInstance<Person, typeof Person>(Person, 'zhangsan', 12)
+```
