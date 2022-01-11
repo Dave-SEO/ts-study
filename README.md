@@ -1459,3 +1459,122 @@ function createInstance<T, P extends ConstructorType<any>>(constructor: Construc
 }
 createInstance<Person, typeof Person>(Person, 'zhangsan', 12)
 ```
+
+### infer在vue3中的应用(unref)
+
+```JavaScript
+    const state:Ref<number> = ref(123)
+    type ObjType = {name: string}
+    const obj:ObjType = {name: 'zhansan'}
+    // infer 出现在泛型的具体化类型上
+    function unref<T>(ref: T): T extends Ref<infer V>? V : T {
+        return isRef(ref) ? (ref.value as any): ref
+    }
+    unref(state) // 123    unref<Ref<number>>(ref: Ref<number>): number
+    unref(obj) //{name:'zhansan'} unref<ObjType>(ref: ObjType): ObjType
+```
+
+# TS 高级类型
+## 内置类型 Extract
+
+```JavaScript
+// ts源码对Extract定义，内置类型可直接使用无需定义
+ type Extract<T, U> = T extends U ? T : never
+```
+### 在子类与父类中的使用 与 类型断言的对比
+
+```JavaScript
+class Person {
+    constructor(public cname: string, public age: number){}
+}
+class XiaoMing {}
+// 子类 extends 父类 永远返回子类（T）
+type ExtractType = Extract<XiaoMing, Person>
+// 父类 extends 子类 除非子类与父类属性和方法相同，否则 永远返回never
+type ExtractType = Extract<Person, XiaoMing>
+
+// 子类父类可以相互断言
+let person = new Person('', 123) as XiaoMing
+let xiaoming = new XiaoMing('', 123, 'red') as Person
+```
+
+### Extract 在联合类型中的使用
+
+```JavaScript
+type ExtractType = Extract<string | number, string>
+ // ts内部会进行分解判断
+   第一次：string extends string ？ T : never // string
+   第二次：number extends string ？ T : never // never  
+   合起来的结果是：string ｜ never // string
+``` 
+
+### Extract 在函数类型中的使用
+
+```JavaScript
+type Fun1 = (name: string) => string
+type Fun2 = (name: string, age: number) => string
+
+// 函数的泛型约束
+// 函数类型上的泛型约束 参数类型(any,never 除外)和返回值完全相同的情况下，
+// 参数少的函数类型 extends 参数多的函数类型 返回true， 反之返回false
+type FunExtendType1 = Fun1 extends Fun2 ? Fun1 : never // Fun1
+type FunExtendType2 = Fun2 extends Fun1 ? Fun2 : never // never
+
+type ExtractFunType1 = Extract<Fun1, Fun2> // (name: string) => string
+type ExtractFunType2 = Extract<Fun2, Fun1> // never
+```
+
+### Extract 使用场景
+
+```JavaScript
+// 1. 获取store值
+const store = {name: 'zhansan', userId: 123, phone: 123456}
+type ExtractType<T> = Extract<T, object>
+function Store<T, U extends keyof T>(obj: ExtractType<T>, key: U){
+    return obj[key]
+}
+Store(store, 'name')
+```
+
+## 内置类型 Exclude(排除)
+
+```JavaScript
+// ts源码对Exclude定义，内置类型可直接使用无需定义
+ type Exclude<T, U> = T extends U ? never ：T
+ 
+ // 找到 Worker 中 与 Student 的差异部分(salary)
+ interface Worker {
+    name: string;
+    age: number;
+    email: string;
+    salary: string;
+}
+
+interface Student {
+    name: string;
+    age: number;
+    email: string;
+    grade: number;
+}
+
+type Exclude<T, U> = T extends U ? never : T
+type ExcludeType = Exclude<keyof Worker, keyof Student> // salary
+
+```
+
+## Record 类型
+
+### 理解 k extends keyof any
+
+```JavaScript
+type KeyofType = keyof any //ts 规定返回 string | number | symbol
+
+k extends keyof any // k extends string | number | symbol
+```
+### 理解 P in K (映射类型)
+
+```JavaScript
+type Record<K extends keyof any, T> {
+    [p in K]: T
+}
+```

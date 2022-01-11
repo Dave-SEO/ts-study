@@ -43,4 +43,12 @@ function get<T, K extends keyof T>(obj: T, key: K){
    return obj[key]
 }
 get(a1, 'name')
+
+
+const store = {name: 'zhansan', age: 12}
+// keyof 用于获取类类型，接口类型等属性名组成的联合类型
+function getStore<T extends Object, K extends keyof T>(obj: T, key: K){
+    return obj[key]
+}
+getStore(store, 'name')
 export {}

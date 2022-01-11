@@ -20,5 +20,10 @@ class People {
 type ObjectKeyOf2 = keyof People
 const a3:ObjectKeyOf2 = 'age' // name | age | say 组成的联合类型
 
-
+const store = {name: 'zhansan', userId: 123, phone: 123456}
+type ExtractType<T> = Extract<T, object>
+function Store<T, U extends keyof T>(obj: ExtractType<T>, key: U){
+    return obj[key]
+}
+Store(store, 'name')
 export {}
