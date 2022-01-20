@@ -9,18 +9,11 @@ type Record<K extends keyof any, T> = {
     [P in K]: T;
 };
 type A = Record<string, PeoPle>
+// [x: string]: PeoPle;
+let a: A = {'ket': {name: '1', 'age': 123}}
 
-type B = {[key in keyof PeoPle]: boolean}
 
-interface PageInfo {
-    title: string;
-}
-  
-  type Page = "home" | "about" | "contact";
-  
-  const nav: Record<Page, PageInfo> = {
-    about: { title: "123" },
-    contact: { title: "3455" },
-    home: { title: "566" },
-  };
+type B<K extends number> = {[key: string]: any}
+
+
 export {}

@@ -1572,9 +1572,76 @@ type KeyofType = keyof any //ts 规定返回 string | number | symbol
 k extends keyof any // k extends string | number | symbol
 ```
 ### 理解 P in K (映射类型)
+> P in K 内部执行了一个循环（可以理解为类似 for...in的效果），这里的P是一个标识符，K下文被设置为 'name' | 'age' 的联合类型，P标识符映射为 K ('name' | 'age')的每一个子类型, T 为数据类型
 
 ```JavaScript
 type Record<K extends keyof any, T> {
     [p in K]: T
 }
+这里如果把 K 换成联合类型：
+type Record<K extends keyof any, T> {
+    [p in 'name' | 'age']: T 
+}
+// 演变为：
+type Record<K extends keyof any, T> {
+    name: T;
+    age: T;
+}
+```
+
+### Record使用场景
+#### 数据扁平化
+
+```JavaScript
+ const goodsymid = Symbol('goodid')
+ type GoodsType = {
+    [goodsymid]: number;
+    name: string;
+    price: number;
+ }
+ 
+ const goods: GoodsType[] = [
+    {
+        [goodsymid]: 1001,
+         name: "苹果",
+         price: 9
+    },
+    {
+        [goodsymid]: 1002,
+         name: "香蕉",
+         price: 6
+    },
+    {
+        [goodsymid]: 1003,
+         name: "香蕉",
+         price: 7
+    }
+]
+// 转换格式：{1001: {name: '',price: ''}, {},...}
+// Record 为ts内置高级类型可不定义
+type Record<T extends keyof any, K>{
+    [P in T]: K
+}
+const flat: Record<number, GoodsType> = {}
+goods.forEach(ret => {
+    flat[ret[goodsymid]] = ret
+})
+```
+
+### Record 优化
+
+```JavaScript
+    type Record<T> = {
+        [P in keyof any]: T
+    }
+    演变为可索引类型:
+    type Record<T> = {
+        [x: string]: T,                      
+        [x: number]: T,
+        [x: symbol]: T
+    }
+    
+ // [x: string] 字符串索引可以是数字类型、字符串类型，最终都会转换为字符串类型 
+ // [x: number] 数字索引可以是数字类型，字符串类型，不可以是数字字符组合
+ // [x: symbol] 索引签名必须是数字类型或字符串类型
 ```
