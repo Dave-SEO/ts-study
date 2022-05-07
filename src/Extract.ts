@@ -46,4 +46,5 @@ type FunExtendType2 = Fun2 extends Fun1 ? Fun2 : never // never
 
 type ExtractFunType1 = Extract<Fun1, Fun2> // (name: string) => string
 type ExtractFunType2 = Extract<Fun2, Fun1> // never
+
 export {}

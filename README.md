@@ -1644,4 +1644,7 @@ goods.forEach(ret => {
  // [x: string] 字符串索引可以是数字类型、字符串类型，最终都会转换为字符串类型 
  // [x: number] 数字索引可以是数字类型，字符串类型，不可以是数字字符组合
  // [x: symbol] 索引签名必须是数字类型或字符串类型
+
+ let a: never = '123'
+ let b: string = a
 ```

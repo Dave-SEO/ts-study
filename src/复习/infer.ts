@@ -17,4 +17,6 @@ type inferRe = inferReturn<FunReternType>
 // 3. infer 出现在泛型的具体化类型上
 type inferFanxing<T> = T extends Set<infer P>? P : never;
 type result = inferFanxing<Set<string>>
+
+
 export {}

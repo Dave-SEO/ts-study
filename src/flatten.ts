@@ -46,5 +46,5 @@ type TestSymbol = {
 }
 
 const sym = Symbol()
-const testSymbol: TestSymbol = {sym: 1223}
+const testSymbol: TestSymbol = {'123': 123}
 export {}
